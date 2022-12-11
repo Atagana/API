@@ -15,11 +15,12 @@ class PostController extends Controller
      */
     public function index()
     {
-        return Post::all([
-            'Name',
-            'Description',
-            'Type'
-        ]);
+        return Post::select('name', 'description', 'type')->paginate(10);
+        // return Post::all([
+        //     'Name',
+        //     'Description',
+        //     'Type'
+        // ]);
     }
 
     /**
