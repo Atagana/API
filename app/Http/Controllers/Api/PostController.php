@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
 use App\Models\Post;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
@@ -41,13 +43,30 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        $posts = Post::create($request->all());
+        try {
+            $imageName = Str::random(20).".".$request->image->getClientOriginalExtension();
 
-        return response()->json([
-            'Name' => $posts['name'],
-            'Description' => $posts['description'],
-            'Type' => $posts['type']
-        ]);
+            //create post
+            $posts = Post::create($request->all());
+
+            //saving image
+            Storage::disk('private')->put($imageName, file_get_contents($request->image));
+
+            /**returning name, type and
+             * description after saving data to
+             *  the database. */
+            return response()->json([
+                'Name' => $posts['name'],
+                'Description' => $posts['description'],
+                'Type' => $posts['type']
+            ],200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => "Error creating Post"
+            ],500);
+        }
+
     }
 
     /**
@@ -58,7 +77,11 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-        //
+        return Post::select([
+            'name',
+            'type',
+            'description',
+            ])->find($post['id']);
     }
 
     /**

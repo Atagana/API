@@ -23,11 +23,20 @@ class StorePostRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            "name" => "required|max:50",
-            "description" => "required|max:250",
-            "image" => "required|max:5000",
-            "type" => "required|should be 1, 2 or 3"
-        ];
+        if (request()->isMethod('post')) {
+            return [
+                "name" => "required|max:50",
+                "description" => "required|max:250",
+                "image" => "required|max:5048",
+                "type" => "required|should be 1, 2 or 3"
+            ];
+        } else {
+            return [
+                "name" => "required|max:50",
+                "description" => "required|max:250",
+                "image" => "required|max:5000",
+                "type" => "required|should be 1, 2 or 3"
+            ];
+        }
     }
 }
