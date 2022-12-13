@@ -83,22 +83,27 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-        // $url = Storage::temporaryUrl('private', now()->addMinutes(10));
-        $url = Storage::temporaryUrl(
+        // $url = Storage::temporaryUrl(
 
-            'private/$posts->imageurl',
+        //     'private/$post->imageurl',
 
-            now()->addMinutes(10),
+        //     now()->addMinutes(10),
 
-            [
+        //     [
 
-            'ResponseContentType' => 'application/octet-stream',
+        //     'ResponseContentType' => 'application/octet-stream',
 
-            'ResponseContentDisposition' => 'attachment; filename=file2.jpg',
+        //     'ResponseContentDisposition' => 'attachment; filename=file2.jpg',
 
-            ]
+        //     ]
 
-            );
+        //     );
+
+
+        $disk = Storage::disk('releases-local');
+
+        return $disk->temporaryUrl($this->path, now()->addMinutes(5));
+
         return Post::select([
             'name',
             'type',

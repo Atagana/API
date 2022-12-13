@@ -1,8 +1,9 @@
 <?php
 
-use App\Http\Controllers\Api\PostController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
+use App\Http\Controllers\Api\PostController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,19 +18,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::resource('/posts', PostController::class);
 
-// Route::post('/posts', [PostController::class, 'store']);
-
-// Route::get('/posts', function() {
-//     return Post::all();
-// });
-
-// Route::post('/posts', function() {
-//     return Post::create([
-//         'name' => 'Post One',
-//         'description' => 'Post One',
-//         'image' => ''
-//     ]);
-// });
+Route::get('local/temp/{path}', function (string $path){
+    return Storage::disk('local')->download($path);
+})->name('local.temp');
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
