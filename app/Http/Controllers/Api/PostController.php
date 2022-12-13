@@ -43,31 +43,37 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        try {
-            $imageName = Str::random(20).".".$request->image->getClientOriginalExtension();
 
-            //create post
-            $posts = Post::create($request->all());
+            $images = new Post();
+            $request->validate([
+                "name" => "required|max:50",
+                "description" => "required|max:250",
+                "image" => "required|max:5048",
+                "type" => "required|digits_between:1,3"
+            ]);
 
-            //saving image
-            Storage::disk('private')->put($imageName, file_get_contents($request->image));
+            $imageName ="";
+            if ($request->hasFile('image')) {
+                $imageName = $request->file('image')->store('private');
+                $images->image=$imageName;
+            $result = $images->save();
 
-            /**returning name, type and
-             * description after saving data to
-             *  the database. */
-            return response()->json([
-                'Name' => $posts['name'],
-                'Description' => $posts['description'],
-                'Type' => $posts['type']
-            ],200);
+            if ($result) {
+                //create post
+                Post::create($request->validated([
+                    'name' => $request['name'],
+                    'description' => $request['description'],
+                    'image' => $request['image'],
+                    'type' => $request['type'],
+            ]));
 
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => "Error creating Post"
-            ],500);
+            return Post::select('name', 'description', 'type');
+            }
+            } else {
+                return false;
+            }
+
         }
-
-    }
 
     /**
      * Display the specified resource.
@@ -77,10 +83,12 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
+        $url = Storage::temporaryUrl('private', now()->addMinutes(10));
         return Post::select([
             'name',
             'type',
             'description',
+            $url['image']
             ])->find($post['id']);
     }
 
